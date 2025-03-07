@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /kontakt
+Disallow: /impressum
+Disallow: /datenschutz
+
+# Sitemap
+Sitemap: https://tarif-vertrag.org/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
+
+# Host
+Host: https://tarif-vertrag.org
