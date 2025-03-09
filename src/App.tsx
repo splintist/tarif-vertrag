@@ -17,7 +17,7 @@ function App() {
 
   return (
     <HelmetProvider>
-      <Router basename="/tarif-vertrag">
+      <Router>
         <div className="min-h-screen bg-gray-50 flex flex-col">
           <Header searchTerm={searchTerm} onSearchChange={setSearchTerm} />
           
