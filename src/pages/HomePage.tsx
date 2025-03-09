@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { IndustryCard } from '../components/IndustryCard';
 import { TarifvertragDetail } from '../components/TarifvertragDetail';
-import { industries, tarifvertraege } from '../data/mockData';
+import { industries, tarifvertraege } from '../data';
 import { Helmet } from 'react-helmet-async';
 
 interface HomePageProps {
@@ -11,12 +11,28 @@ interface HomePageProps {
 }
 
 export function HomePage({ searchTerm, filteredItems }: HomePageProps) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "url": "https://tarif-vertrag.org",
+    "name": "Deutsche Tarifverträge Database",
+    "description": "Aktuelle deutsche Tarifverträge für alle Branchen. Finden Sie Gehälter, Arbeitszeiten und Urlaubsansprüche in unserer umfassenden Datenbank.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://tarif-vertrag.org/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <>
       <Helmet>
         <title>Deutsche Tarifverträge Database - Aktuelle Tarifverträge für alle Branchen</title>
         <meta name="description" content="Finden Sie aktuelle Tarifverträge für alle Branchen. Einfach durchsuchbar und immer auf dem neuesten Stand." />
         <link rel="canonical" href="https://tarif-vertrag.org" />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
       </Helmet>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

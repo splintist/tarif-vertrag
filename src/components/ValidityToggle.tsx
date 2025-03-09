@@ -20,10 +20,20 @@ export function ValidityToggle({ value, onChange }: ValidityToggleProps) {
         Aktuelle Verträge
       </button>
       <button
+        onClick={() => onChange('future')}
+        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+          value === 'future'
+            ? 'bg-green-100 text-green-800'
+            : 'text-gray-600 hover:text-gray-800'
+        }`}
+      >
+        Zukünftige Verträge
+      </button>
+      <button
         onClick={() => onChange('historical')}
         className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
           value === 'historical'
-            ? 'bg-blue-100 text-blue-800'
+            ? 'bg-gray-100 text-gray-800'
             : 'text-gray-600 hover:text-gray-800'
         }`}
       >

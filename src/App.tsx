@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Header } from './components/Header';
-import { InProgressBanner } from './components/InProgressBanner';
 import { HomePage } from './pages/HomePage';
 import { TarifvertragPage } from './pages/TarifvertragPage';
 import { IndustryPage } from './pages/IndustryPage';
@@ -11,16 +10,15 @@ import { ContactPage } from './pages/ContactPage';
 import { ImpressumPage } from './pages/ImpressumPage';
 import { DatenschutzPage } from './pages/DatenschutzPage';
 import { useSearch } from './hooks/useSearch';
-import { tarifvertraege } from './data/mockData';
+import { tarifvertraege } from './data';
 
 function App() {
   const { searchTerm, setSearchTerm, filteredItems } = useSearch(tarifvertraege);
 
   return (
     <HelmetProvider>
-      <Router>
+      <Router basename="/tarif-vertrag">
         <div className="min-h-screen bg-gray-50 flex flex-col">
-          <InProgressBanner />
           <Header searchTerm={searchTerm} onSearchChange={setSearchTerm} />
           
           <div className="flex-grow">
@@ -62,9 +60,6 @@ function App() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Kontakt</h3>
-                  <p className="text-gray-300 mb-2">
-                    tarif-vertrag@mailbox.org
-                  </p>
                   <Link 
                     to="/kontakt" 
                     className="text-blue-400 hover:text-blue-300 inline-flex items-center"

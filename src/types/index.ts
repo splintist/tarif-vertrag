@@ -9,13 +9,22 @@ export interface Tarifvertrag {
   workingHours: number;
   holidays: number;
   description: string;
-  union?: string;
-  specialBenefits?: string[];
-  nightShiftBonus?: number;
-  overtimeBonus?: number;
-  christmasBonus?: number;
-  vacationBonus?: number;
+  christmasBonus?: {
+    years: string;
+    percentage: number;
+  };
+  entgeltgruppenInfo: EntgeltgruppenInfo[];
+  entgeltstufenInfo: EntgeltstufenInfo[];
   isHistorical?: boolean;
+  isFuture?: boolean;
+  replaces?: string; // ID of the Tarifvertrag this one replaces
+  changes?: TarifvertragChange[];
+}
+
+export interface TarifvertragChange {
+  type: 'increase' | 'decrease' | 'new' | 'removed' | 'modified';
+  description: string;
+  details?: string;
 }
 
 export interface WageStructure {
@@ -33,4 +42,16 @@ export interface Industry {
   imageUrl: string;
 }
 
-export type ValidityFilter = 'current' | 'historical' | 'all';
+export interface EntgeltgruppenInfo {
+  group: string;
+  description: string;
+  examples: string[];
+}
+
+export interface EntgeltstufenInfo {
+  stufe: string;
+  duration: string;
+  description: string;
+}
+
+export type ValidityFilter = 'current' | 'historical' | 'future' | 'all';

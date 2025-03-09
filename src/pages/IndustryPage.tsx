@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft } from 'lucide-react';
-import { industries, tarifvertraege } from '../data/mockData';
+import { industries, tarifvertraege } from '../data';
 import { TarifvertragDetail } from '../components/TarifvertragDetail';
 import { ValidityToggle } from '../components/ValidityToggle';
-import { ValidityFilter } from '../types';
+import { ValidityFilter, Tarifvertrag } from '../types';
 
 interface IndustryPageProps {
   searchTerm: string;
@@ -17,16 +17,38 @@ export function IndustryPage({ searchTerm, filteredItems }: IndustryPageProps) {
   const [validityFilter, setValidityFilter] = useState<ValidityFilter>('current');
   
   const industry = industries.find(i => i.id === industryId);
+
+  // Helper function to find the newest agreement for a given title base
+  const isNewestAgreement = (tarifvertrag: Tarifvertrag): boolean => {
+    const baseTitle = tarifvertrag.title.split(' 20')[0]; // Get base title without year
+    const relatedAgreements = tarifvertraege
+      .filter(t => t.title.startsWith(baseTitle))
+      .filter(t => !t.isFuture); // Exclude future agreements
+
+    const maxValidFrom = Math.max(
+      ...relatedAgreements.map(t => new Date(t.validFrom).getTime())
+    );
+    
+    return new Date(tarifvertrag.validFrom).getTime() === maxValidFrom;
+  };
   
   // Filter items by both industry and search term
   const displayedItems = (searchTerm ? filteredItems : tarifvertraege)
     .filter(t => t.industry === industryId)
     .filter(t => {
+      const now = new Date();
+      const validFrom = new Date(t.validFrom);
+      const validUntil = new Date(t.validUntil);
+
       switch (validityFilter) {
         case 'current':
-          return !t.isHistorical;
+          // Show if it's the newest non-future agreement
+          return !t.isHistorical && !t.isFuture && isNewestAgreement(t);
         case 'historical':
-          return t.isHistorical;
+          // Show if it's marked as historical or if there's a newer non-future agreement
+          return t.isHistorical || (!t.isFuture && !isNewestAgreement(t));
+        case 'future':
+          return t.isFuture || now < validFrom;
         default:
           return true;
       }
@@ -115,7 +137,9 @@ export function IndustryPage({ searchTerm, filteredItems }: IndustryPageProps) {
                     ? 'Aktuell sind keine gültigen Tarifverträge für diese Branche verfügbar.'
                     : validityFilter === 'historical'
                       ? 'Keine historischen Tarifverträge für diese Branche verfügbar.'
-                      : 'Keine Tarifverträge für diese Branche verfügbar.'}
+                      : validityFilter === 'future'
+                        ? 'Keine zukünftigen Tarifverträge für diese Branche verfügbar.'
+                        : 'Keine Tarifverträge für diese Branche verfügbar.'}
               </p>
             )}
           </div>
