@@ -13,57 +13,81 @@ export function TarifvertragDetail({ tarifvertrag }: TarifvertragDetailProps) {
   const [showEntgeltstufen, setShowEntgeltstufen] = useState(false);
   const [showChanges, setShowChanges] = useState(false);
 
-  const isNewestAgreement = (): boolean => {
-    const baseTitle = tarifvertrag.title.split(' 20')[0];
-    const relatedAgreements = tarifvertraege
-      .filter(t => t.title.startsWith(baseTitle))
-      .filter(t => !t.isFuture);
-
-    const maxValidFrom = Math.max(
-      ...relatedAgreements.map(t => new Date(t.validFrom).getTime())
-    );
-    
-    return new Date(tarifvertrag.validFrom).getTime() === maxValidFrom;
-  };
-
-  const getStatusBadge = () => {
+  const getValidityStatus = (): { status: 'current' | 'future' | 'historical' | 'nachwirkend'; label: string; className: string } => {
     const now = new Date();
     const validFrom = new Date(tarifvertrag.validFrom);
     const validUntil = new Date(tarifvertrag.validUntil);
 
-    if (tarifvertrag.isHistorical) {
-      return (
-        <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-gray-100 text-gray-800">
-          Historischer Vertrag
-        </span>
+    // Helper function to find if this is the newest agreement
+    const isNewestAgreement = (): boolean => {
+      const baseTitle = tarifvertrag.title.split(' 20')[0];
+      const relatedAgreements = tarifvertraege
+        .filter(t => t.title.startsWith(baseTitle))
+        .filter(t => new Date(t.validFrom) <= now); // Only consider agreements that have started
+
+      const maxValidFrom = Math.max(
+        ...relatedAgreements.map(t => new Date(t.validFrom).getTime())
       );
-    } else if (tarifvertrag.isFuture) {
-      return (
-        <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-green-100 text-green-800">
-          Zukünftiger Vertrag
-        </span>
-      );
-    } else if (now >= validFrom && now <= validUntil) {
-      return (
-        <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800">
-          Aktuell gültig
-        </span>
-      );
-    } else if (isNewestAgreement()) {
-      return (
-        <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800">
-          Nachwirkend gültig
-        </span>
-      );
+      
+      return new Date(tarifvertrag.validFrom).getTime() === maxValidFrom;
+    };
+
+    // Future agreement
+    if (now < validFrom) {
+      return {
+        status: 'future',
+        label: 'Zukünftiger Vertrag',
+        className: 'bg-green-100 text-green-800'
+      };
     }
-    return null;
+    
+    // Currently valid
+    if (now >= validFrom && now <= validUntil) {
+      return {
+        status: 'current',
+        label: 'Aktuell gültig',
+        className: 'bg-blue-100 text-blue-800'
+      };
+    }
+    
+    // Check if it's the newest expired agreement (nachwirkend)
+    if (now > validUntil && isNewestAgreement()) {
+      return {
+        status: 'nachwirkend',
+        label: 'Nachwirkend gültig',
+        className: 'bg-yellow-100 text-yellow-800'
+      };
+    }
+    
+    // Historical
+    return {
+      status: 'historical',
+      label: 'Historischer Vertrag',
+      className: 'bg-gray-100 text-gray-800'
+    };
   };
+
+  const formatChristmasBonus = () => {
+    if (!tarifvertrag.christmasBonus) return null;
+
+    if (typeof tarifvertrag.christmasBonus.percentage === 'number') {
+      return `${tarifvertrag.christmasBonus.percentage}%`;
+    }
+
+    return Object.entries(tarifvertrag.christmasBonus.percentage)
+      .map(([group, percentage]) => `${group}: ${percentage}%`)
+      .join(', ');
+  };
+
+  const validityStatus = getValidityStatus();
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-2xl font-bold text-gray-900">{tarifvertrag.title}</h2>
-        {getStatusBadge()}
+        <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${validityStatus.className}`}>
+          {validityStatus.label}
+        </span>
       </div>
       
       {/* Meta Information */}
@@ -83,13 +107,18 @@ export function TarifvertragDetail({ tarifvertrag }: TarifvertragDetailProps) {
         {tarifvertrag.christmasBonus && (
           <div className="flex items-center text-gray-600">
             <Gift className="h-5 w-5 mr-2" />
-            <span>Weihnachtsgeld: {tarifvertrag.christmasBonus.percentage}% ({tarifvertrag.christmasBonus.years})</span>
+            <div>
+              <span>Jahressonderzahlung: {formatChristmasBonus()}</span>
+              {tarifvertrag.christmasBonus.details && (
+                <p className="text-sm text-gray-500 mt-1">{tarifvertrag.christmasBonus.details}</p>
+              )}
+            </div>
           </div>
         )}
       </div>
 
       {/* Changes Section for Future Contracts */}
-      {tarifvertrag.isFuture && tarifvertrag.changes && (
+      {validityStatus.status === 'future' && tarifvertrag.changes && (
         <div className="mb-8">
           <button
             onClick={() => setShowChanges(!showChanges)}

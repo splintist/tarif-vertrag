@@ -32,7 +32,7 @@ function App() {
                 element={<IndustryPage searchTerm={searchTerm} filteredItems={filteredItems} />} 
               />
               <Route 
-                path="/tarifvertrag/:id" 
+                path="/branche/:industryId/:id" 
                 element={<TarifvertragPage searchTerm={searchTerm} filteredItems={filteredItems} />} 
               />
               <Route path="/faq" element={<FAQPage />} />

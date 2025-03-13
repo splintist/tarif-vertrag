@@ -11,13 +11,11 @@ export interface Tarifvertrag {
   description: string;
   christmasBonus?: {
     years: string;
-    percentage: number;
+    percentage: number | { [key: string]: number };
+    details?: string;
   };
   entgeltgruppenInfo: EntgeltgruppenInfo[];
   entgeltstufenInfo: EntgeltstufenInfo[];
-  isHistorical?: boolean;
-  isFuture?: boolean;
-  replaces?: string; // ID of the Tarifvertrag this one replaces
   changes?: TarifvertragChange[];
 }
 

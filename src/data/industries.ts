@@ -18,5 +18,11 @@ export const industries: Industry[] = [
     name: 'Private Banken',
     description: 'Tarifverträge für Beschäftigte in privaten Banken',
     imageUrl: 'https://images.unsplash.com/photo-1501167786227-4cba60f6d58f?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'metall-elektro',
+    name: 'Metall- und Elektroindustrie',
+    description: 'Tarifverträge für Beschäftigte in der Metall- und Elektroindustrie',
+    imageUrl: 'https://images.unsplash.com/photo-1565034946487-077786996e27?auto=format&fit=crop&q=80&w=800'
   }
 ];

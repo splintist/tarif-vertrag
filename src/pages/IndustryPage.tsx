@@ -18,47 +18,92 @@ export function IndustryPage({ searchTerm, filteredItems }: IndustryPageProps) {
   
   const industry = industries.find(i => i.id === industryId);
 
-  // Helper function to find the newest agreement for a given title base
-  const isNewestAgreement = (tarifvertrag: Tarifvertrag): boolean => {
-    const baseTitle = tarifvertrag.title.split(' 20')[0]; // Get base title without year
-    const relatedAgreements = tarifvertraege
-      .filter(t => t.title.startsWith(baseTitle))
-      .filter(t => !t.isFuture); // Exclude future agreements
+  const breadcrumbData = industry ? {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Startseite",
+        "item": "https://tarif-vertrag.org"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": industry.name,
+        "item": `https://tarif-vertrag.org/branche/${industry.id}`
+      }
+    ]
+  } : null;
 
-    const maxValidFrom = Math.max(
-      ...relatedAgreements.map(t => new Date(t.validFrom).getTime())
-    );
-    
-    return new Date(tarifvertrag.validFrom).getTime() === maxValidFrom;
+  const getValidityStatus = (tarifvertrag: Tarifvertrag): 'current' | 'future' | 'historical' | 'nachwirkend' => {
+    const now = new Date();
+    const validFrom = new Date(tarifvertrag.validFrom);
+    const validUntil = new Date(tarifvertrag.validUntil);
+
+    // Helper function to find if this is the newest agreement
+    const isNewestAgreement = (): boolean => {
+      const baseTitle = tarifvertrag.title.split(' 20')[0];
+      const relatedAgreements = tarifvertraege
+        .filter(t => t.title.startsWith(baseTitle))
+        .filter(t => new Date(t.validFrom) <= now); // Only consider agreements that have started
+
+      const maxValidFrom = Math.max(
+        ...relatedAgreements.map(t => new Date(t.validFrom).getTime())
+      );
+      
+      return new Date(tarifvertrag.validFrom).getTime() === maxValidFrom;
+    };
+
+    if (now < validFrom) return 'future';
+    if (now >= validFrom && now <= validUntil) return 'current';
+    if (now > validUntil && isNewestAgreement()) return 'nachwirkend';
+    return 'historical';
   };
   
-  // Filter items by both industry and search term
   const displayedItems = (searchTerm ? filteredItems : tarifvertraege)
     .filter(t => t.industry === industryId)
     .filter(t => {
-      const now = new Date();
-      const validFrom = new Date(t.validFrom);
-      const validUntil = new Date(t.validUntil);
+      const status = getValidityStatus(t);
 
       switch (validityFilter) {
         case 'current':
-          // Show if it's the newest non-future agreement
-          return !t.isHistorical && !t.isFuture && isNewestAgreement(t);
+          return status === 'current' || status === 'nachwirkend';
         case 'historical':
-          // Show if it's marked as historical or if there's a newer non-future agreement
-          return t.isHistorical || (!t.isFuture && !isNewestAgreement(t));
+          return status === 'historical';
         case 'future':
-          return t.isFuture || now < validFrom;
+          return status === 'future';
         default:
           return true;
       }
+    })
+    .sort((a, b) => {
+      const aStatus = getValidityStatus(a);
+      const bStatus = getValidityStatus(b);
+
+      // Define order of status types
+      const statusOrder = {
+        current: 0,
+        nachwirkend: 1,
+        future: 2,
+        historical: 3
+      };
+
+      // First sort by status
+      if (statusOrder[aStatus] !== statusOrder[bStatus]) {
+        return statusOrder[aStatus] - statusOrder[bStatus];
+      }
+
+      // Within same status, sort by validFrom date (newest first)
+      return new Date(b.validFrom).getTime() - new Date(a.validFrom).getTime();
     });
 
   if (!industry) {
     return (
       <>
         <Helmet>
-          <title>Branche nicht gefunden - Deutsche Tarifverträge Database</title>
+          <title>Branche nicht gefunden - Deutsche Tarifverträge Datenbank</title>
           <meta name="robots" content="noindex, follow" />
         </Helmet>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -78,9 +123,12 @@ export function IndustryPage({ searchTerm, filteredItems }: IndustryPageProps) {
   return (
     <>
       <Helmet>
-        <title>{industry.name} Tarifverträge - Deutsche Tarifverträge Database</title>
+        <title>{industry.name} Tarifverträge - Deutsche Tarifverträge Datenbank</title>
         <meta name="description" content={`Aktuelle Tarifverträge für die Branche ${industry.name}. ${industry.description}`} />
-        <link rel="canonical" href={`https://tarifvertrag-db.de/branche/${industry.id}`} />
+        <link rel="canonical" href={`https://tarif-vertrag.org/branche/${industry.id}`} />
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbData)}
+        </script>
       </Helmet>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -123,7 +171,7 @@ export function IndustryPage({ searchTerm, filteredItems }: IndustryPageProps) {
             {displayedItems.map((tarifvertrag) => (
               <Link 
                 key={tarifvertrag.id}
-                to={`/tarifvertrag/${tarifvertrag.id}`}
+                to={`/branche/${industry.id}/${tarifvertrag.id}`}
                 className="block"
               >
                 <TarifvertragDetail tarifvertrag={tarifvertrag} />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { TarifvertragDetail } from '../components/TarifvertragDetail';
-import { tarifvertraege } from '../data';
+import { tarifvertraege, industries } from '../data';
 import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { ValidityToggle } from '../components/ValidityToggle';
@@ -13,11 +13,37 @@ interface TarifvertragPageProps {
 }
 
 export function TarifvertragPage({ searchTerm, filteredItems }: TarifvertragPageProps) {
-  const { id } = useParams<{ id: string }>();
+  const { id, industryId } = useParams<{ id: string; industryId: string }>();
   const [validityFilter, setValidityFilter] = useState<ValidityFilter>('current');
   const navigate = useNavigate();
   
-  const currentTarifvertrag = tarifvertraege.find(t => t.id === id);
+  const currentTarifvertrag = tarifvertraege.find(t => t.id === id && t.industry === industryId);
+  const industry = currentTarifvertrag ? industries.find(i => i.id === currentTarifvertrag.industry) : null;
+
+  const breadcrumbData = currentTarifvertrag && industry ? {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Startseite",
+        "item": "https://tarif-vertrag.org"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": industry.name,
+        "item": `https://tarif-vertrag.org/branche/${industry.id}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": currentTarifvertrag.title,
+        "item": `https://tarif-vertrag.org/branche/${industry.id}/${currentTarifvertrag.id}`
+      }
+    ]
+  } : null;
 
   const structuredData = currentTarifvertrag ? {
     "@context": "https://schema.org",
@@ -54,7 +80,7 @@ export function TarifvertragPage({ searchTerm, filteredItems }: TarifvertragPage
           {filteredItems.map((tarifvertrag) => (
             <Link 
               key={tarifvertrag.id}
-              to={`/tarifvertrag/${tarifvertrag.id}`}
+              to={`/branche/${tarifvertrag.industry}/${tarifvertrag.id}`}
               className="block"
             >
               <TarifvertragDetail tarifvertrag={tarifvertrag} />
@@ -70,11 +96,11 @@ export function TarifvertragPage({ searchTerm, filteredItems }: TarifvertragPage
     );
   }
 
-  if (!currentTarifvertrag) {
+  if (!currentTarifvertrag || !industry) {
     return (
       <>
         <Helmet>
-          <title>Tarifvertrag nicht gefunden - Deutsche Tarifverträge Database</title>
+          <title>Tarifvertrag nicht gefunden - Deutsche Tarifverträge Datenbank</title>
           <meta name="robots" content="noindex, follow" />
         </Helmet>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -92,7 +118,7 @@ export function TarifvertragPage({ searchTerm, filteredItems }: TarifvertragPage
   }
 
   const allVersions = tarifvertraege.filter(t => 
-    t.title.startsWith(currentTarifvertrag.title.split(' 20')[0])
+    t.title.startsWith(currentTarifvertrag.title.split(' 20')[0]) && t.industry === industryId
   );
 
   const displayedVersions = allVersions.filter(t => {
@@ -115,17 +141,18 @@ export function TarifvertragPage({ searchTerm, filteredItems }: TarifvertragPage
   return (
     <>
       <Helmet>
-        <title>{currentTarifvertrag.title} - Deutsche Tarifverträge Database</title>
+        <title>{currentTarifvertrag.title} - Deutsche Tarifverträge Datenbank</title>
         <meta 
           name="description" 
           content={`${currentTarifvertrag.title} - Gehalt, Arbeitszeit und Urlaubsanspruch. Gültig von ${new Date(currentTarifvertrag.validFrom).toLocaleDateString('de-DE')} bis ${new Date(currentTarifvertrag.validUntil).toLocaleDateString('de-DE')}`} 
         />
-        <link rel="canonical" href={`https://tarif-vertrag.org/tarifvertrag/${currentTarifvertrag.id}`} />
-        {structuredData && (
-          <script type="application/ld+json">
-            {JSON.stringify(structuredData)}
-          </script>
-        )}
+        <link rel="canonical" href={`https://tarif-vertrag.org/branche/${industry.id}/${currentTarifvertrag.id}`} />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbData)}
+        </script>
       </Helmet>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

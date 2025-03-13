@@ -27,11 +27,33 @@ export function FAQPage() {
     }
   ];
 
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Startseite",
+        "item": "https://tarif-vertrag.org"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "FAQ",
+        "item": "https://tarif-vertrag.org/faq"
+      }
+    ]
+  };
+
   return (
     <>
       <Helmet>
-        <title>FAQ - Deutsche Tarifverträge Database</title>
-        <meta name="description" content="Häufig gestellte Fragen zur Deutschen Tarifverträge Database. Erfahren Sie mehr über unsere Datenbank und wie Sie dazu beitragen können." />
+        <title>FAQ - Deutsche Tarifverträge Datenbank</title>
+        <meta name="description" content="Häufig gestellte Fragen zur Deutschen Tarifverträge Datenbank. Erfahren Sie mehr über unsere Datenbank und wie Sie dazu beitragen können." />
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbData)}
+        </script>
       </Helmet>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
