@@ -6,6 +6,7 @@ import { industries, tarifvertraege } from '../data';
 import { TarifvertragDetail } from '../components/TarifvertragDetail';
 import { ValidityToggle } from '../components/ValidityToggle';
 import { ValidityFilter, Tarifvertrag } from '../types';
+import { AdUnit } from '../components/AdUnit';
 
 interface IndustryPageProps {
   searchTerm: string;
@@ -157,6 +158,9 @@ export function IndustryPage({ searchTerm, filteredItems }: IndustryPageProps) {
           <p className="text-xl text-gray-600">{industry.description}</p>
         </div>
 
+        {/* Top Ad Unit */}
+        <AdUnit slot="7531902468" />
+
         <section>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-gray-900">
@@ -168,14 +172,17 @@ export function IndustryPage({ searchTerm, filteredItems }: IndustryPageProps) {
           </div>
           
           <div className="space-y-8">
-            {displayedItems.map((tarifvertrag) => (
-              <Link 
-                key={tarifvertrag.id}
-                to={`/branche/${industry.id}/${tarifvertrag.id}`}
-                className="block"
-              >
-                <TarifvertragDetail tarifvertrag={tarifvertrag} />
-              </Link>
+            {displayedItems.map((tarifvertrag, index) => (
+              <React.Fragment key={tarifvertrag.id}>
+                <Link 
+                  to={`/branche/${industry.id}/${tarifvertrag.id}`}
+                  className="block"
+                >
+                  <TarifvertragDetail tarifvertrag={tarifvertrag} />
+                </Link>
+                {/* Insert ad after every 3 items */}
+                {(index + 1) % 3 === 0 && <AdUnit slot="8642097531" />}
+              </React.Fragment>
             ))}
             {displayedItems.length === 0 && (
               <p className="text-gray-600 text-center py-8">
@@ -192,6 +199,9 @@ export function IndustryPage({ searchTerm, filteredItems }: IndustryPageProps) {
             )}
           </div>
         </section>
+
+        {/* Bottom Ad Unit */}
+        <AdUnit slot="9753120864" />
       </main>
     </>
   );

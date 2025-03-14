@@ -5,6 +5,7 @@ import { TarifvertragDetail } from '../components/TarifvertragDetail';
 import { industries, tarifvertraege } from '../data';
 import { Helmet } from 'react-helmet-async';
 import { Tarifvertrag } from '../types';
+import { AdUnit } from '../components/AdUnit';
 
 interface HomePageProps {
   searchTerm: string;
@@ -109,21 +110,26 @@ export function HomePage({ searchTerm, filteredItems }: HomePageProps) {
           </p>
         </div>
 
+        {/* Top Ad Unit */}
+        <AdUnit slot="1234567890" />
+
         {/* Search Results */}
         {searchTerm && (
           <section className="mb-12" aria-label="Suchergebnisse">
             <h2 className="text-2xl font-semibold text-gray-900 mb-6">
               Suchergebnisse ({sortedItems.length})
             </h2>
-            {sortedItems.map((tarifvertrag) => (
-              <div key={tarifvertrag.id} className="mb-8">
+            {sortedItems.map((tarifvertrag, index) => (
+              <React.Fragment key={tarifvertrag.id}>
                 <Link 
                   to={`/branche/${tarifvertrag.industry}/${tarifvertrag.id}`}
                   aria-label={`Details für ${tarifvertrag.title}`}
                 >
                   <TarifvertragDetail tarifvertrag={tarifvertrag} />
                 </Link>
-              </div>
+                {/* Insert ad after every 3 items */}
+                {(index + 1) % 3 === 0 && <AdUnit slot="9876543210" />}
+              </React.Fragment>
             ))}
             {sortedItems.length === 0 && (
               <p className="text-gray-600 text-center py-8">
@@ -144,6 +150,8 @@ export function HomePage({ searchTerm, filteredItems }: HomePageProps) {
                 </div>
               ))}
             </div>
+            {/* Bottom Ad Unit */}
+            <AdUnit slot="5432109876" />
           </section>
         )}
       </main>

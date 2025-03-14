@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { ValidityToggle } from '../components/ValidityToggle';
 import { ValidityFilter } from '../types';
+import { AdUnit } from '../components/AdUnit';
 
 interface TarifvertragPageProps {
   searchTerm: string;
@@ -76,15 +77,20 @@ export function TarifvertragPage({ searchTerm, filteredItems }: TarifvertragPage
           </h1>
         </div>
 
+        <AdUnit slot="1357924680" />
+
         <div className="space-y-8">
-          {filteredItems.map((tarifvertrag) => (
-            <Link 
-              key={tarifvertrag.id}
-              to={`/branche/${tarifvertrag.industry}/${tarifvertrag.id}`}
-              className="block"
-            >
-              <TarifvertragDetail tarifvertrag={tarifvertrag} />
-            </Link>
+          {filteredItems.map((tarifvertrag, index) => (
+            <React.Fragment key={tarifvertrag.id}>
+              <Link 
+                to={`/branche/${tarifvertrag.industry}/${tarifvertrag.id}`}
+                className="block"
+              >
+                <TarifvertragDetail tarifvertrag={tarifvertrag} />
+              </Link>
+              {/* Insert ad after every 3 items */}
+              {(index + 1) % 3 === 0 && <AdUnit slot="2468013579" />}
+            </React.Fragment>
           ))}
           {filteredItems.length === 0 && (
             <p className="text-gray-600 text-center py-8">
@@ -171,12 +177,19 @@ export function TarifvertragPage({ searchTerm, filteredItems }: TarifvertragPage
           )}
         </div>
 
+        {/* Top Ad Unit */}
+        <AdUnit slot="3692581470" />
+
         <div className="space-y-12">
           {displayedVersions.length > 0 ? (
-            displayedVersions.map((version) => (
-              <article key={version.id}>
-                <TarifvertragDetail tarifvertrag={version} />
-              </article>
+            displayedVersions.map((version, index) => (
+              <React.Fragment key={version.id}>
+                <article>
+                  <TarifvertragDetail tarifvertrag={version} />
+                </article>
+                {/* Insert ad after every version except the last one */}
+                {index < displayedVersions.length - 1 && <AdUnit slot="4803692581" />}
+              </React.Fragment>
             ))
           ) : (
             validityFilter === 'current' && (
@@ -196,6 +209,9 @@ export function TarifvertragPage({ searchTerm, filteredItems }: TarifvertragPage
             </p>
           )}
         </div>
+
+        {/* Bottom Ad Unit */}
+        <AdUnit slot="5914803692" />
       </main>
     </>
   );
