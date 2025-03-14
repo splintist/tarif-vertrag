@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: '/tarif-vertrag/',
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
@@ -14,14 +15,5 @@ export default defineConfig({
   preview: {
     // Handle client-side routing in preview mode
     historyApiFallback: true,
-  },
-  build: {
-    // Generate a 200.html fallback for client-side routing
-    rollupOptions: {
-      input: {
-        main: './index.html',
-        '200': './index.html',
-      },
-    },
   },
 });
