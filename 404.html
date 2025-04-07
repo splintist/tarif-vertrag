@@ -1,27 +1,68 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="de">
   <head>
-    <meta charset="utf-8">
-    <title>Deutsche Tarifverträge Datenbank</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Aktuelle deutsche Tarifverträge für alle Branchen. Finden Sie Gehälter, Arbeitszeiten und Urlaubsansprüche in unserer umfassenden Datenbank." />
+    <meta name="keywords" content="Tarifvertrag, Tarifverträge, Gehalt, Tariflohn, Gewerkschaft, Deutschland, Arbeitnehmer, TVöD, Öffentlicher Dienst, Banken" />
+    <meta name="author" content="tarif-vertrag.org" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tarif-vertrag.org" />
+    <meta property="og:title" content="Deutsche Tarifverträge Datenbank" />
+    <meta property="og:description" content="Aktuelle deutsche Tarifverträge für alle Branchen. Finden Sie Gehälter, Arbeitszeiten und Urlaubsansprüche in unserer umfassenden Datenbank." />
+    <meta property="og:image" content="https://tarif-vertrag.org/og-image.jpg" />
+    <meta property="og:site_name" content="Deutsche Tarifverträge Datenbank" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Deutsche Tarifverträge Datenbank" />
+    <meta name="twitter:description" content="Aktuelle deutsche Tarifverträge für alle Branchen. Finden Sie Gehälter, Arbeitszeiten und Urlaubsansprüche in unserer umfassenden Datenbank." />
+    <meta name="twitter:image" content="https://tarif-vertrag.org/twitter-card.jpg" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#ffffff" />
+    
+    <!-- Language -->
+    <link rel="canonical" href="https://tarif-vertrag.org" />
+    <link rel="alternate" href="https://tarif-vertrag.org" hreflang="de-DE" />
+    <link rel="alternate" href="https://tarif-vertrag.org" hreflang="x-default" />
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5847114744956507" crossorigin="anonymous"></script>
+    
+    <!-- Start Single Page Apps for GitHub Pages -->
     <script type="text/javascript">
       // Single Page Apps for GitHub Pages
       // MIT License
       // https://github.com/rafgraph/spa-github-pages
-      // This script takes the current URL and converts the path and query
-      // string into just a query string, and then redirects the browser
-      // to the new URL with only a query string and hash fragment.
-      var pathSegmentsToKeep = 0;
-
-      var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
+      // This script checks to see if a redirect is present in the query string,
+      // converts it back into the correct url and adds it to the
+      // browser's history using window.history.replaceState(...),
+      // which won't cause the browser to attempt to load the new url.
+      // When the single page app is loaded further down in this file,
+      // the correct url will be waiting in the browser's history for
+      // the single page app to route accordingly.
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
     </script>
+    <!-- End Single Page Apps for GitHub Pages -->
+    
+    <title>Deutsche Tarifverträge Datenbank - Aktuelle Tarifverträge für alle Branchen</title>
+    <script type="module" crossorigin src="/assets/index-B9end5XI.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DScCg012.css">
   </head>
   <body>
+    <div id="root"></div>
   </body>
 </html>
