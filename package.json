@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run generate-sitemap",
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-sitemap": "node scripts/generate-sitemap.js",
     "predeploy": "npm run build",
-    "deploy": "echo 'tarif-vertrag.org' > ./build/CNAME && gh-pages -d dist"
+    "deploy": "echo 'tarif-vertrag.org' > ./dist/CNAME && cp ./dist/index.html ./dist/404.html && gh-pages -d dist"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",
